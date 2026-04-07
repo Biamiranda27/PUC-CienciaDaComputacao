@@ -1,0 +1,116 @@
+/* Para o exercício do mux2x1 (Atividade 0), faça um projeto onde a saída do mux2x1 é entrada de seleção de outro mux2x1, conforme figura abaixo. Use port map de forma semelhante ao projeto do somador completo (presente nos slides). Fazer este projeto e simulação no EDA Playground.
+
+Copiar os arquivos de design e testbench (top-entity) desenvolvidos e inserir como resposta deste exercício.
+
+São necessários dois arquivos .vhd de design:
+Design do mux (da atividade passada).
+Design de combinação (onde o port map é realizado).
+Neste design, o component do mux é inserido.
+O somador completo dos slides é apenas um exemplo. Considere as diferenças entre os projetos, ou seja, entradas, saídas e sinais são diferentes. 
+top-entity (EDA Playground): arquivo de testbench para o top-design.
+É necessário apenas o testbench do top-entity, ou seja, do arquivo .vhd de combinação (port map).
+O testbench do mux é referente à atividade passada e serve apenas para testar o mux e não o design desta atividade.
+*/
+
+
+//design
+library ieee;
+use ieee.std_logic_1164.all;
+entity mult2x1_2 is
+port (
+e_1 : in std_logic;
+e_2 : in std_logic;
+e_3 : in std_logic;
+e_4 : in std_logic;
+sel_1 : in std_logic;
+s_1 : out std_logic
+);
+end mult2x1_2;
+architecture arch_mult2x1_2 of mult2x1_2 is
+component mult2x1 is
+port( e1: in std_logic;
+e2: in std_logic;
+sel: in std_logic;
+s: out std_logic );
+end component;
+signal S_sel: std_logic;
+begin
+mux1: mult2x1
+port map(
+ e1 => e_3,
+e2 => e_4,
+sel => S_sel,
+s => s_1
+);
+mux2: mult2x1
+port map(
+ e1 => e_1,
+e2 => e_2,
+sel => sel_1,
+s => S_sel
+);
+end arch_mult2x1_2;
+
+//testbench
+library ieee;
+use ieee.std_logic_1164.all;
+entity mult2x1_2_tb is
+end mult2x1_2_tb;
+architecture testmult2x1_2 of mult2x1_2_tb is
+component mult2x1_2
+port (
+e_1 : in std_logic;
+e_2 : in std_logic;
+e_3 : in std_logic;
+e_4 : in std_logic;
+sel_1 : in std_logic;
+s_1 : out std_logic
+);
+end component;
+signal e_1 : std_logic := '0';
+signal e_2 : std_logic := '0';
+signal e_3 : std_logic := '0';
+signal e_4 : std_logic := '0';
+signal sel_1 : std_logic := '0';
+signal s_1 : std_logic;
+begin
+uut: mult2x1_2
+port map (
+e_1 => e_1,
+e_2 => e_2,
+e_3 => e_3,
+e_4 => e_4,
+sel_1 => sel_1,
+s_1 => s_1
+);
+stim_proc : process
+begin
+wait for 1 ns;
+e_1 <= '1';
+e_2 <= '1';
+e_3 <= '1';
+e_4 <= '1';
+sel_1 <= '1';
+wait for 1 ns;
+sel_1 <= '0';
+wait for 1 ns;
+e_1 <= '0';
+e_2 <= '1';
+e_3 <= '0';
+e_4 <= '0';
+sel_1 <= '1';
+wait for 1 ns;
+e_1 <= '0';
+e_2 <= '0';
+e_3 <= '1';
+e_4 <= '0';
+sel_1 <= '1';
+wait for 1 ns;
+e_1 <= '0';
+e_2 <= '0';
+e_3 <= '0';
+e_4 <= '1';
+sel_1 <= '1';
+wait;
+end process;
+end testmult2x1_2;
