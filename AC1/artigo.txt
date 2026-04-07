@@ -1,0 +1,66 @@
+**Título: Comparando Tecnologias Lógicas Programáveis: PROM, PLA, PAL, SPLD, CPLD, FPGA, ASIC, ASSP e SoC**
+
+**Resumo:**
+Este trabalho tem como objetivo apresentar uma comparação entre diferentes tipos de dispositivos lógicos programáveis e integrados, com foco especial nos CPLDs e FPGAs. A análise parte de dois estudos: um projeto usando CPLD na automação industrial e um artigo sobre uma CPU reconfigurável baseada em CPLDs da Philips. Ao longo do texto, são discutidas as características, aplicações e diferenças entre PROM, PLA, PAL, SPLD, CPLD, FPGA, ASIC, ASSP e SoC, com o intuito de ajudar estudantes e profissionais a entenderem qual tecnologia pode ser mais adequada em diferentes contextos.
+
+---
+
+**1. Introdução**
+
+Na área da engenharia e da computação, os dispositivos lógicos programáveis vêm ganhando cada vez mais espaço. Eles permitem criar circuitos digitais que podem ser modificados conforme a necessidade do projeto. Neste trabalho, vamos comparar algumas dessas tecnologias, principalmente os CPLDs e FPGAs, utilizando como base um estudo técnico sobre CPLDs aplicados à automação e um artigo científico que propõe o uso de CPLDs em uma CPU reconfigurável.
+
+---
+
+**2. Dispositivos que marcaram o início: PROM, PLA e PAL**
+
+| Critério | PROM | PLA | PAL |
+|----------|------|-----|-----|
+| Como funciona | É como uma memória onde as entradas viram endereços e as saídas, dados | Tem duas camadas programáveis: AND e OR | Só a camada AND é programável, a OR é fixa |
+| Flexibilidade | Muito baixa | Alta | Média |
+| Eficiência | Pouco eficiente para lógica | Boa, mas com atrasos e custo maior | Boa para circuitos simples |
+| Importância histórica | Foi o primeiro tipo programável | Primeiro PLD de verdade | Deu origem a dispositivos mais modernos |
+
+Esses três dispositivos representam as raízes da lógica programável e ajudaram a formar a base para o desenvolvimento de SPLDs, CPLDs e FPGAs.
+
+---
+
+**3. Visão geral dos dispositivos modernos**
+
+| Dispositivo | O que é e como funciona | Aplicações vistas nos textos |
+|------------|--------------------------|------------------------------|
+| SPLD | Dispositivos simples como PALs e PLAs | Base de funcionamento dos CPLDs (PDF) |
+| CPLD | Vários SPLDs juntos, com interconexões programáveis | Controle industrial e lógica reconfigurável para CPU (artigo) |
+| FPGA | Blocos lógicos interligados, com estrutura mais complexa | Capaz de fazer lógica muito avançada, mas não foi usado no artigo por ser complexo demais |
+| ASIC | Chip feito sob medida para uma função | Muito caro, por isso evitado nos dois textos |
+| ASSP | Chip feito para uma função específica, mas vendido pronto | Não aparece diretamente, mas também não serve para reconfiguração |
+| SoC | Um sistema completo (CPU, memória, etc.) num único chip | Não foi foco dos textos, mas é citado como possível evolução |
+
+---
+
+**4. Comparando CPLD e FPGA na prática**
+
+| Critério | CPLD | FPGA |
+|---------|------|------|
+| Estrutura interna | Usa blocos SPLD conectados de forma previsível | Tem blocos lógicos e roteamento mais complexo |
+| Capacidade | Média (até 10.000 portas lógicas) | Alta (centenas de milhares de portas) |
+| Reconfiguração | Pode ser regravado, mas não durante o funcionamento | Pode ser reconfigurado em tempo real |
+| Velocidade | Muito rápida e com pouca variação | Também rápida, mas com menos previsibilidade |
+| Custo | Mais barato | Mais caro |
+| Facilidade de uso | Mais simples | Requer mais conhecimento técnico |
+| Exemplo do PDF | Controle de processos industriais | Não utilizado por ser caro e além da necessidade |
+| Exemplo do artigo | Lógica personalizada em uma CPU | Evitado por imprevisibilidade de tempo de resposta |
+
+---
+
+**5. Conclusão**
+
+Ao analisar todos esses dispositivos, fica claro que a escolha entre eles depende muito do tipo de projeto. Os **CPLDs** são ótimos quando se busca algo rápido, confiável, barato e fácil de programar, como vimos no estudo de automação industrial e no artigo da CPU híbrida. Já os **FPGAs** são mais indicados quando o projeto é mais complexo e exige mudanças frequentes durante a execução. 
+
+Além disso, entender como dispositivos como **PROM, PLA e PAL** abriram caminho para os mais modernos ajuda a compreender a evolução da lógica digital. Em resumo, este trabalho mostra como o conhecimento dessas tecnologias pode facilitar a tomada de decisão em projetos de engenharia, computação e automação.
+
+---
+
+**Referências:**
+- Freitas, T. T., Pasqualinoto, T. L., & Leão, J. C. (2005). *O CPLD aplicado em automação industrial*. SENAI.
+- Kastrup, B. (1998). *Automatic Hardware Synthesis for a Hybrid Reconfigurable CPU Featuring Philips CPLDs*. arXiv:cs/9811021.
+
