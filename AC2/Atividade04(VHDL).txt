@@ -1,0 +1,198 @@
+/*Faça o design de uma ULA de 1 bit que possui somente:
+
+somador completo de 1 bit.
+operação AND.
+Utilize como ponto de partida, a figura acima, os códigos somador completo e meio somador presentes nos slides e o mux2x1.vhd desenvolvido na Atividade 0.
+
+Ao todo, serão estes os códigos de design em VHDL:
+
+meio somador.
+somador completo.
+faz o port map do meio somador.
+acrescente ao código a operação AND.
+nesse caso, o somador completo terá duas saídas, soma e and.
+multiplexador 2x1.
+unidade lógica e aritmética (ULA).
+faz o port map do somador completo com o multiplexador.
+Embora mais de um testbench possa ser feito, é necessário apenas o testbench.vhd da ULA.
+
+Inserir como resposta, os seguintes códigos: meiosomador.vhd, somadorcompleto.vhd, mux2x1.vhd, ula.vhd, testbench.vhd.
+*/
+
+
+library ieee;
+use ieee.std_logic_1164.all;
+entity meioSomador is
+port(
+a : in std_logic;
+b : in std_logic;
+soma : out std_logic;
+carry : out std_logic
+);
+end meioSomador;
+architecture arch_meioSomador of meioSomador is
+begin
+soma <= (a and not b) or (not a and b);
+carry <= a and b;
+end arch_meioSomador;
+entity mux2x1 is
+port (
+e1 : in std_logic;
+e2 : in std_logic;
+sel : in std_logic;
+s : out std_logic
+);
+end mux2x1;
+architecture arch_mult2x1 of mux2x1 is
+begin
+with sel select
+s <= e1 when '0',
+e2 when others;
+end arch_mult2x1;
+entity somadorcompleto is
+port (
+a : in std_logic;
+b : in std_logic;
+ci : in std_logic;
+s : out std_logic;
+co : out std_logic;
+op_and : out std_logic
+);
+end somadorcompleto;
+architecture structural of somadorcompleto is
+component meioSomador
+port(
+a : in std_logic;
+b : in std_logic;
+soma : out std_logic;
+carry : out std_logic
+);
+end component;
+signal s_soma1 : std_logic;
+signal s_carry1 : std_logic;
+signal s_soma2 : std_logic;
+begin
+MS1: meioSomador
+port map (
+a => a,
+b => b,
+soma => s_soma1,
+carry => s_carry1
+);
+MS2: meioSomador
+port map (
+a => s_soma1,
+b => ci,
+soma => s,
+carry => s_soma2
+);
+co <= s_carry1 or s_soma2;
+op_and <= a and b; -- Saída op_and
+end structural;
+entity ula is
+port (
+a : in std_logic;
+b : in std_logic;
+ci : in std_logic;
+sel : in std_logic;
+saida : out std_logic;
+carryOut : out std_logic
+);
+end ula;
+architecture structural of ula is
+component somadorcompleto
+port (
+a : in std_logic;
+b : in std_logic;
+ci : in std_logic;
+s : out std_logic;
+co : out std_logic;
+op_and : out std_logic
+);
+end component;
+component mux2x1
+port (
+e1 : in std_logic;
+e2 : in std_logic;
+sel : in std_logic;
+s : out std_logic
+);
+end component;
+signal s_soma : std_logic;
+signal s_and : std_logic;
+signal s_cout_temp : std_logic;
+begin
+U_SOMADOR: somadorcompleto
+port map (
+a => a,
+b => b,
+ci => ci,
+s => s_soma,
+co => s_cout_temp,
+op_and => s_and
+);
+U_MUX: mux2x1
+port map (
+e1 => s_soma,
+e2 => s_and,
+sel => sel,
+s => saida
+);
+carryOut <= s_cout_temp;
+end structural;
+
+library ieee;
+use ieee.std_logic_1164.all;
+entity ula_tb is
+end ula_tb;
+architecture test_ula of ula_tb is
+component ula
+port (
+a : in std_logic;
+b : in std_logic;
+ci : in std_logic;
+sel : in std_logic;
+saida : out std_logic;
+carryOut : out std_logic
+);
+end component;
+signal s_a : std_logic := '0';
+signal s_b : std_logic := '0';
+signal s_ci : std_logic := '0';
+signal s_sel : std_logic := '0';
+signal s_saida : std_logic;
+signal s_co : std_logic;
+begin
+DUT: ula
+port map (
+a => s_a,
+b => s_b,
+ci => s_ci,
+sel => s_sel,
+saida => s_saida,
+carryOut => s_co
+);
+tb_process: process
+begin
+s_sel <= '0';
+s_a <= '0'; s_b <= '0'; s_ci <= '0';
+wait for 10 ns;
+s_a <= '1'; s_b <= '0'; s_ci <= '0';
+wait for 10 ns;
+s_a <= '1'; s_b <= '1'; s_ci <= '0';
+wait for 10 ns;
+s_a <= '1'; s_b <= '1'; s_ci <= '1';
+wait for 10 ns;
+s_sel <= '1';
+s_ci <= '0';
+s_a <= '0'; s_b <= '0';
+wait for 10 ns;
+s_a <= '0'; s_b <= '1';
+wait for 10 ns;
+s_a <= '1'; s_b <= '0';
+wait for 10 ns;
+s_a <= '1'; s_b <= '1';
+wait for 10 ns;
+wait;
+end process tb_process;
+end test_ula;
