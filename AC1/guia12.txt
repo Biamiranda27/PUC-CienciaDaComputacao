@@ -1,0 +1,50 @@
+
+
+
+Questão 01 – RAM 1x4 com flip-flops JK
+Verilog: ram1x4.v
+Logisim: ram1x4.circ
+
+Memória com 1 palavra de 4 bits, usando flip-flops JK. Escreve na borda de subida, lê na borda de descida. Possui controle R/W, clock e enable (ADDR).
+
+
+Questão 02 – RAM 1x8 usando duas RAM 1x4
+Verilog: ram1x8.v
+Logisim: ram1x8.circ
+
+Implementação de 8 bits usando dois módulos 1x4 da questão 01.
+
+
+Questão 03 – RAM 2x8 usando duas RAM 1x8
+Verilog: ram2x8.v
+Logisim: ram2x8.circ
+
+Dois endereços (selecionáveis) de 8 bits. Utiliza lógica de seleção de endereço e enable para cada RAM 1x8.
+
+
+Questão 04 – RAM 4x8 usando RAM 2x8
+Verilog: ram4x8.v
+Logisim: ram4x8.circ
+
+Usa dois módulos 2x8. Controle de seleção de 2 bits.
+
+
+Questão 05 – RAM 8x8 usando RAM 4x8
+Verilog: ram8x8.v
+Logisim: ram8x8.circ
+
+Ampliação para 3 bits de endereço. Seleciona entre quatro RAMs 2x8 ou duas RAMs 4x8.
+
+
+Questão Extra 06 – RAM 4x16 usando RAM 4x8
+Verilog: ram4x16.v
+Logisim: ram4x16.circ
+
+Combina duas RAMs 4x8 em paralelo para formar cada linha de 16 bits.
+
+
+Questão Extra 07 – RAM 8x16 usando RAM 1x16
+Verilog: ram8x16.v
+Logisim: ram8x16.circ
+
+Utiliza multiplexação de 3 bits de endereço para selecionar entre 8 RAMs 1x16.
