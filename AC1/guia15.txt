@@ -1,0 +1,225 @@
+
+
+ORG 0000h
+
+; carregar dado01 em A
+LDA 8000h         ; A <- dado01
+
+; carregar dado02 em C
+LXI H, 8001h
+MOV A, M          ; A <- dado02
+MOV C, A          ; C <- dado02
+
+; subtrair dado02 de dado01
+LDA 8000h         ; A <- dado01
+SUB C             ; A = dado01 - dado02
+
+; salvar resultado temporário em B
+MOV B, A          ; B = dado01 - dado02
+
+; carregar dado03 em C
+LXI H, 8002h
+MOV A, M          ; A <- dado03
+MOV C, A          ; C <- dado03
+
+; somar dado03 ao resultado
+MOV A, B          ; A = dado01 - dado02
+ADD C             ; A = (dado01 - dado02) + dado03
+
+; salvar resultado em dado04
+STA 8003h
+
+HLT
+
+
+ORG 0000h
+
+; carregar dado01 (low)
+LDA 8000h
+MOV B, A          ; B = dado01 low
+; carregar dado01 (high)
+LXI H, 8001h
+MOV A, M
+MOV C, A          ; C = dado01 high
+
+; carregar dado02 (low)
+LXI H, 8002h
+MOV A, M
+ADD B             ; A = dado02 low + dado01 low
+MOV B, A          ; B = resultado low parcial
+
+; carregar dado02 (high)
+LXI H, 8003h
+MOV A, M
+ADC C             ; A = dado02 high + dado01 high + carry
+MOV C, A          ; C = resultado high parcial
+
+; carregar dado03 (low) para subtrair
+LXI H, 8004h
+MOV A, M
+MOV D, A          ; D = dado03 low
+
+; carregar dado03 (high) para subtrair
+LXI H, 8005h
+MOV A, M
+MOV E, A          ; E = dado03 high
+
+; subtrair dado03 (low)
+MOV A, B          ; A = resultado low parcial
+SUB D             ; A = A - dado03 low
+MOV B, A          ; B = resultado low após subtração
+
+; subtrair dado03 (high) com borrow
+MOV A, C          ; A = resultado high parcial
+SBB E             ; A = A - dado03 high - borrow
+MOV C, A          ; C = resultado high após subtração
+
+; carregar dado04 (low)
+LXI H, 8006h
+MOV A, M
+ADD B             ; A = dado04 low + resultado low
+MOV B, A          ; B = resultado low final
+
+; carregar dado04 (high)
+LXI H, 8007h
+MOV A, M
+ADC C             ; A = dado04 high + resultado high + carry
+MOV C, A          ; C = resultado high final
+
+; salvar resultado em dado05 (low)
+MOV A, B
+STA 8008h
+
+; salvar resultado em dado05 (high)
+MOV A, C
+STA 8009h
+
+HLT
+
+
+ORG 0000h
+
+; carregar dado01 em A
+LDA 8000h        ; A <- dado01 (BCD)
+
+; subtrair dado02
+MOV B, A         ; salvar dado01 em B
+LDA 8001h        ; A <- dado02
+CMA              ; complemento de A para subtração
+STC              ; setar carry para subtrair 1
+ADD B            ; A = dado01 - dado02
+DAA              ; ajuste decimal
+
+; subtrair dado03
+MOV B, A         ; salvar resultado parcial em B
+LDA 8002h        ; A <- dado03
+CMA
+STC
+ADD B            ; subtração: resultado - dado03
+DAA              ; ajuste decimal
+
+; somar dado04
+MOV B, A         ; salvar resultado parcial em B
+LDA 8003h        ; A <- dado04
+ADD B            ; soma
+DAA              ; ajuste decimal
+
+; salvar resultado em dado05
+STA 8004h
+
+HLT
+
+
+ORG 0000h
+
+; Carregar dado02 para multiplicar por 3
+LDA 8001h        ; A <- dado02
+MOV B, A         ; B = dado02
+MOV C, A         ; C = dado02
+
+; Soma dado02 + dado02 = 2*dado02
+ADD B            ; A = dado02 + dado02
+
+; Somar mais dado02 para 3*dado02
+ADD C            ; A = 3 * dado02
+
+; Salvar 3*dado02 em B
+MOV B, A
+
+; Carregar dado01
+LDA 8000h        ; A <- dado01
+
+; Subtrair 3*dado02
+CMA              ; complemento de A para subtração
+STC              ; setar carry para 1
+ADD B            ; A = dado01 - 3*dado02 (via complemento)
+; Opcional: ajustar flags manualmente se necessário
+
+; Salvar resultado parcial em C
+MOV C, A
+
+; Dobrar resultado = resultado + resultado
+MOV A, C
+ADD C            ; A = 2 * (dado01 - 3*dado02)
+
+; Salvar em dado03
+STA 8002h
+
+HLT
+
+
+ORG 0000h
+
+; --- Multiplicar dado01 por 8 ---
+
+LDA 8000h        ; A = dado01
+
+; Salvar A em B para rotações
+MOV B, A
+
+; Rotacionar à esquerda 3 vezes, cuidando do sinal
+; Usar RAL (rotate accumulator left through carry)
+
+RAL              ; 1ª rotação
+RAL              ; 2ª rotação
+RAL              ; 3ª rotação
+
+; Resultado em A (dado01 * 8)
+
+MOV C, A         ; salvar resultado parcial em C
+
+; --- Dividir dado02 por 2 com sinal ---
+
+LDA 8001h        ; A = dado02
+
+; Checar se número é negativo (bit 7)
+ANI 80h          ; máscara para bit 7
+JZ POSITIVE      ; se zero, é positivo ou zero
+
+; Se negativo, dividir por 2 assim:
+; Aritmética: (valor >> 1) com preservação do sinal
+; Faz shift lógico para direita (RRC) uma vez (bit baixo vai para carry),
+; depois seta bit 7 (sinal) para 1 para preservar o sinal negativo.
+
+LDA 8001h        ; recarrega dado02
+RRC              ; rotate right carry, bit 0 vai para carry, bits deslocados para direita
+ORI 80h          ; seta bit 7 para 1 (preservar sinal)
+JMP DIV_END
+
+POSITIVE:
+; Se positivo, só shift lógico (RRC)
+LDA 8001h
+RRC
+
+DIV_END:
+MOV B, A         ; salvar resultado da divisão em B
+
+; --- Somar os resultados ---
+
+MOV A, C         ; A = dado01 * 8
+ADD B            ; A = dado01 * 8 + dado02 / 2
+
+; Salvar resultado em dado03
+STA 8002h
+
+HLT
