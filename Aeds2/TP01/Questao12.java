@@ -3,6 +3,7 @@ Crie um metodo recursivo que recebe um numero inteiro como parametro e retorna a
 linha de saıda com o resultado da soma dos dıgitos. Por exemplo, se a entrada for 12345, a saıda deve ser 15.
 */
 
+
 import java.util.*;
 public class SomaDigitosR {
 
