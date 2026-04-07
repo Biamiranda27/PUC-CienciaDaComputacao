@@ -1,0 +1,130 @@
+/*Elabore a detecção de overflow para uma ULA.
+*/
+
+
+///design
+library ieee;
+use ieee.std_logic_1164.ALL;
+use ieee.numeric_std.ALL;
+entity ULA_OVF IS
+generic ( N : integer := 8 );
+port (
+A, B : in signed(N-1 downto 0);
+Op : in std_logic_vector(1 downto 0);
+R : out signed(N-1 downto 0);
+Overflow : out std_logic;
+Zero : out std_logic
+);
+end entity ULA_OVF;
+architecture arch_ULA_OVF of ULA_OVF is
+signal temp : signed(N downto 0);
+signal cout, cin : std_logic;
+begin
+process (A, B, Op)
+variable A_ext, B_ext : signed(N downto 0);
+variable result : signed(N downto 0);
+begin
+A_ext := (others => '0');
+B_ext := (others => '0');
+A_ext(N-1 downto 0) := A;
+A_ext(N) := A(N-1);
+B_ext(N-1 downto 0) := B;
+B_ext(N) := B(N-1);
+case Op is
+when "00" =>
+result := A_ext + B_ext;
+R <= result(N-1 downto 0);
+when "01" =>
+result := A_ext - B_ext;
+R <= result(N-1 downto 0);
+when "10" =>
+R <= A and B;
+result := (others => '0');
+when "11" =>
+R <= A or B;
+result := (others => '0');
+when others =>
+R <= (others => 'X');
+result := (others => 'X');
+end case;
+temp <= result;
+end process;
+Overflow <= temp(N) xor temp(N-1) when Op = "00" OR Op = "01" else 
+'0';
+Zero <= '1' when R = (others => '0') else '0';
+end architecture arch_ULA_OVF;
+
+//testebench
+library ieee;
+use ieee.std_logic_1164.ALL;
+use ieee.numeric_std.ALL;
+entity ULA_OVF_TB is
+end entity ULA_OVF_TB;
+architecture test_ULA_OVF_TB of ULA_OVF_TB is
+constant N : integer := 8;
+component ULA_OVF
+generic ( N : integer := 8 );
+port (
+A, B : in signed(N-1 downto 0);
+Op : in std_logic_vector(1 downto 0);
+R : out signed(N-1 downto 0);
+Overflow : out std_logic;
+Zero : out std_logic
+);
+end component;
+signal A_t, B_t : signed(N-1 downto 0) := (others => '0');
+signal Op_t : std_logic_vector(1 downto 0) := (others => '0');
+signal R_t : signed(N-1 downto 0);
+signal Overflow_t : std_logic;
+signal Zero_t : std_logic;
+begin
+DUT: ULA_OVF
+generic map ( N => N )
+port map (
+A => A_t,
+B => B_t,
+Op => Op_t,
+R => R_t,
+Overflow => Overflow_t,
+Zero => Zero_t
+);
+process
+begin
+A_t <= to_signed(7, N);
+B_t <= to_signed(5, N);
+Op_t <= "00";
+wait for 10 ns;
+assert R_t = to_signed(12, N) and Overflow_t = '0'
+report "Teste 1 (add sem OVF) deu Overflow."
+severity error;
+A_t <= to_signed(90, N);
+B_t <= to_signed(50, N);
+Op_t <= "00";
+wait for 10 ns;
+assert Overflow_t = '1'
+report "Teste 2 (add com OVF) deu Overflow."
+severity error;
+A_t <= to_signed(10, N);
+B_t <= to_signed(5, N);
+Op_t <= "01";
+wait for 10 ns;
+assert R_t = to_signed(5, N) and Overflow_t = '0'
+report "Teste 3 (sub sem OVF) deu Overflow."
+severity error;
+A_t <= to_signed(-90, N);
+B_t <= to_signed(50, N);
+Op_t <= "01";
+wait for 10 ns;
+assert Overflow_t = '1'
+report "Teste 4 (sub com OVF) deu Overflow."
+severity error;
+A_t <= to_signed(25, N);
+B_t <= to_signed(12, N);
+Op_t <= "10";
+wait for 10 ns;
+assert R_t = to_signed(8, N) and Overflow_t = '0'
+report "Teste 5 (and sem OVF) deu Overflow."
+severity error;
+wait;
+end process;
+end architecture test_ULA_OVF_TB;
