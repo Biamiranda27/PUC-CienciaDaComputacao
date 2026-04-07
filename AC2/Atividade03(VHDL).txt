@@ -1,0 +1,137 @@
+/*A tabela verdade a seguir é referente a um decodificador.
+
+Tabela Verdade: A, B, C são entradas e S1, S2 e S3 são saídas.
+
+A	B	C	S1	S2	S3
+0	0	0	0	0	0
+0	0	1	0	0	1
+0	1	0	0	1	0
+0	1	1	1	1	1
+1	0	0	0	0	0
+1	0	1	0	0	1
+1	1	0	1	1	0
+1	1	1	1	1	1
+Faça o design.vhd deste decodificador de duas formas diferentes:
+
+Comportamental.
+Estrutural: Para a descrição estrutural, extrair a expressão simplificada da tabela verdade vai facilitar a descrição.
+Seguir este método:
+
+Faça o design comportamental, o testbench, e depois teste o funcionamento.
+Em seguida, comente o trecho comportamental do arquivo de design, insira o novo trecho estrutural, e faça o teste com o mesmo arquivo de testbench.
+Inserir como resposta o arquivo de design.vhd (com os dois trechos, sendo um comentado) e de testbench.vhd.
+*/
+
+
+//design
+library ieee;
+use ieee.std_logic_1164.all;
+entity TrueTable is
+port (
+a : in std_logic;
+b : in std_logic;
+ c : in std_logic;
+s1 : out std_logic;
+s2 : out std_logic;
+s3 : out std_logic;
+);
+end TrueTable;
+architecture Behavioral of TrueTable is
+begin
+process ( a, b, c )
+begin
+case a & b & c is
+when "000" =>
+s1 <= '0'; s2 <= '0'; s3 <= '0';
+when "001" =>
+s1 <= '0'; s2 <= '0'; s3 <= '1';
+when "010" =>
+s1 <= '1'; s2 <= '0'; s3 <= '1';
+when "011" =>
+s1 <= '1'; s2 <= '1'; s3 <= '1';
+when "100" =>
+s1 <= '0'; s2 <= '0'; s3 <= '0';
+when "101" =>
+s1 <= '0'; s2 <= '0'; s3 <= '1';
+when "110" =>
+s1 <= '1'; s2 <= '1'; s3 <= '0';
+when "111" =>
+s1 <= '1'; s2 <= '1'; s3 <= '1';
+when others =>
+s1 <= 'x'; s2 <= 'x'; s3 <= 'x';
+end case;
+end process;
+end Behavioral;
+----------------------- Arquitetura Estrutural ------------------------
+-- para usar essa parte devo comentar "architecture Behavioral of 
+TrueTable is" até "end Behavioral;" , e descomentar as linhas abaixo, para 
+o programa rodar
+-- s1 = b
+-- s2 = b (a + c) = a and b or b and c
+-- s3 = c + a'bc' = c or (not a and b and not c)
+-- architecture Estrutural of TrueTable is
+-- begin
+-- s1 <= b;
+-- s2 = a and b or b and c
+-- s2 <= (a and b) or (b and c);
+-- s3 = c or (not a and b and not c)
+-- s3 <= c or (not a and b and not c);
+-- end Estrutural;
+
+///testbench
+library ieee;
+use ieee.std_logic_1164.all;
+entity true_table is
+end true_table;
+architecture testBench of true_table is
+component TrueTable
+port(
+a : in std_logic;
+b : in std_logic;
+c : in std_logic;
+s1 : out std_logic;
+s2 : out std_logic;
+s3 : out std_logic;
+end component;
+signal a_in : std_logic := '0';
+signal b_in : std_logic := '0';
+signal c_in : std_logic := '0';
+signal s1_out : std_logic;
+signal s2_out : std_logic;
+signal s3_out : std_logic;
+begin
+uut: trueTable port map (
+a => a_in,
+b => b_in,
+c => c_in,
+s1 => s1_out,
+s2 => s2_out,
+s3 => s3_out
+);
+stim_proc: process
+begin
+a_in <= '0';
+b_in <= '0';
+c_in <= '0';
+wait for 10 ns;
+c_in <= '1';
+wait for 10 ns;
+b_in <= '1';
+c_in <= '0';
+wait for 10 ns;
+c_in <= '1';
+wait for 10 ns;
+a_in <= '1';
+b_in <= '0';
+c_in <= '0';
+wait for 10 ns;
+c_in <= '1';
+wait for 10 ns;
+b_in <= '1';
+c_in <= '0';
+wait for 10 ns;
+c_in <= '1';
+wait for 10 ns;
+wait;
+end process;
+end testBench;
