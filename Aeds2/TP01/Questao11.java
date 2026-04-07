@@ -4,6 +4,7 @@ saıda com a string invertida. Por exemplo, se a entrada for “abcde”, a saı
 */
 
 
+
 import java.util.Scanner;
 
 public class InvercaoStringR {
