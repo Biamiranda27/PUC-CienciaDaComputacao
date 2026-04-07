@@ -55,7 +55,6 @@ class AlteracaoAleatoria{
         scanner.close();
     }
 }
-
      
     
 
