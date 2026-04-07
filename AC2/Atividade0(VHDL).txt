@@ -1,0 +1,84 @@
+---------design.vhd---------
+
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity mult2x1 is //essa é a parte das entradas e saída
+    port (
+        e1  : in std_logic; //primeira entrada de dados
+        e2  : in std_logic; //segunda entrada de dados
+        sel : in std_logic; //sinal de seleção
+        s   : out std_logic //única saída
+    );
+//como estava escrito anteriormente estava certo também, mas por preferência troquei a //escrita
+end mult2x1;
+
+architecture arch_mult2x1 of mult2x1 is
+begin
+    with sel select
+        s <= e1 when '0', //não sei se o erro foi por copiar e colar do canvas, mas //ajustei as aspas para aspas simples
+             e2 when others;
+end arch_mult2x1;
+
+ 
+
+ 
+
+---------testbench.vhd---------
+
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity mult2x1_tb is
+end mult2x1_tb;
+
+architecture testmult2x1 of mult2x1_tb is
+ 
+    component mult2x1
+        port (
+            e1  : in std_logic; //primeira entrada de dados
+            e2  : in std_logic; //segunda entrada de dados
+            sel : in std_logic; //sinal de seleção
+            s   : out std_logic //única saída
+        );
+//como estava escrito anteriormente estava certo também, mas //por preferência troquei a escrita
+    end component;
+
+    signal e1  : std_logic := '0'; //declara o signal e1, que //tem valor inicial 0
+    signal e2  : std_logic := '0'; //declara o signal e2, que //tem valor inicial 0
+    signal sel : std_logic := '0'; //declara o signal sel, //que tem valor inicial 0
+    signal s   : std_logic; //declara o signal s, mas não tem
+//valor inicial, pois depende da entrada
+//para fazer a declaração de um signal é preferível //inicializá-lo com um valor
+
+begin
+
+    uut: mult2x1
+        port map (
+            e1  => e1,
+            e2  => e2,
+            sel => sel,
+            s   => s
+        );
+
+    tb: process
+    begin
+        wait for 1 ns;
+        e1  <= '1';
+        e2  <= '1';
+        sel <= '1';
+
+        wait for 1 ns;
+        sel <= '0'; //altera apenas o seletor para 0 e e1 e //e2 continuam 1
+//essa parte foi adicionada para testar como reage com a  //mudança do seletor
+
+        wait for 1 ns;
+        e1  <= '0'; // e1 recebe 0
+        e2  <= '1'; // e2 recebe 1
+        sel <= '1'; // sel recebe 1
+//essa parte foi adicionada para testar a entrada de e2
+
+        wait;
+    end process;
+
+end testmult2x1;
