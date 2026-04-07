@@ -1,0 +1,49 @@
+
+
+
+Questão 01 – Mealy FSM para reconhecer 1101
+Arquivo: mealy_1101.v
+
+Abordagem Mealy para identificar a sequência 1101, com reações mais rápidas às entradas.
+
+
+Questão 02 – Moore FSM para reconhecer 1101
+Arquivo: moore_1101.v
+
+Abordagem Moore para identificar a sequência 1101, com saída vinculada apenas ao estado.
+
+
+Questão 03 – Módulo de teste das FSMs anteriores
+Arquivo: Guia_1100.v
+
+Testa e compara as saídas das FSMs Mealy e Moore com uma entrada de exemplo.
+
+
+Questão 04 – FSM para reconhecer apenas a primeira ocorrência de 1010 e parar
+Arquivo: Guia_1101.v
+
+Implementar FSM (qualquer abordagem) que detecta a primeira 1010 e ignora repetições.
+
+
+Questão 05 – Mealy FSM para reconhecer 1010 sem interseção
+Arquivo: Guia_1102.v
+
+Implementar FSM do tipo Mealy, que reconhece apenas uma 1010 por vez (sem sobreposição).
+
+
+Questão 06 – Moore FSM para reconhecer 1010 com interseção
+Arquivo: Guia_1103.v
+
+Implementar FSM Moore que detecta 1010 mesmo com sobreposição, contando múltiplas ocorrências.
+
+
+Questão Extra 07 – FSM que reconhece x111 (qualquer bit seguido de três '1')
+Arquivo: Guia_1104.v
+
+Detectar qualquer sequência terminando em 111, com qualquer valor na primeira posição.
+
+
+Questão Extra 08 – FSM que reconhece sequências começando com 010 ou 101
+Arquivo: Guia_1105.v
+
+Detectar início com três bits alternados (padrão alternante de zeros e uns).
