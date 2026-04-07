@@ -1,0 +1,113 @@
+/*Neste projeto, você fará uso do mux2x1.vhd da Atividade 0.
+Será necessário  usar este código como component para o mux de 32 bits.
+O novo código de design (mux2x1_32bits.vhd) deve fazer uso do for para que 32 muxes 2x1 sejam replicados no projeto. Um exemplo do uso do for está em um dos slides de aula. 
+
+Um arquivo testbench.vhd deverá ser feito para o mux2x1_32bits.vhd.
+Neste arquivo, dentro do process (local onde os dados de entrada são inseridos) você deverá fazer uso também do for para 10 iterações com variações de entrada. Uma sugestão:
+
+Dentro do process, Inicie/fixe as duas entradas, por exemplo, e_1_tb e e_2_tb com bits diferentes tais como: "11111111111111111111111111111111" e "00000000000000000000000000000000". Isso facilitará a visualização de mudança na saída.
+
+Depois, crie um for apenas para alterar o valor do bit de seleção. A cada nova iteração, o bit de seleção muda de 0 para 1 ou de 1 para 0. Lembrando que a entrada de seleção só tem um bit, já que o multiplexador, embora de 32 bits, continua sendo 2x1.
+
+Há uma pequena diferença entre o uso dos dois for:
+
+no design, o for é usado para generate.
+no testbench, o for é usado para loop.
+ou seja, no testbench, use loop ao invés de generate, e no lugar do port map, inicie com a condição (if) para alternar o valor do bit de seleção.
+da mesma forma que existe o end generate, existe o end loop.
+Em VHDL, além do if há também elsif e else.
+elsif é usado apenas se houver outra condição a testar depois do if.
+
+Um exemplo de uso do if:
+
+if (condição) then
+
+            código;
+
+else
+
+            código;
+
+end if;
+
+O wait for 100 ns; é colocado antes do for (depois de fixar valores nas entradas) e antes do end loop.
+
+Responder o exercício com os códigos do mux2x1_32bits.vhd e do testbench.vhd.
+*/
+
+
+
+//design
+library ieee;
+use ieee.std_logic_1164.all;
+entity mux2x1_32_bits is
+port (
+e_1_tb : in std_logic_vector(31 downto 0);
+e_2_tb : in std_logic_vector(31 downto 0);
+sel_sel : in std_logic;
+s_s : out std_logic_vector(31 downto 0)
+);
+end mux2x1_32_bits;
+architecture arch of mux2x1_32_bits is
+component mux2x1 is
+port( e1: in std_logic;
+e2: in std_logic;
+sel: in std_logic;
+s: out std_logic );
+end component;
+begin
+muxes: for i in 0 to 31 generate
+mux_instance : mux2x1
+port map( e1 => e_1_tb(i),
+e2 => e_2_tb(i),
+sel => sel_sel,
+s => s_s(i)
+);
+end generate muxes;
+end arch;
+
+//testbench
+library ieee;
+use ieee.std_logic_1164.all;
+entity mux2x1_32_tb is
+end mux2x1_32_tb;
+architecture test of mux2x1_32_tb is
+component mux2x1_32_bits
+port (
+e_1_tb : in std_logic_vector(31 downto 0);
+e_2_tb : in std_logic_vector(31 downto 0);
+sel_sel : in std_logic;
+s_s : out std_logic_vector(31 downto 0)
+);
+end component;
+signal e_1_tb_s : std_logic_vector(31 downto 0) := 
+(others => '0');
+signal e_2_tb_s : std_logic_vector(31 downto 0) := 
+(others => '0');
+signal sel_sel_s : std_logic := '0';
+signal s_s_out : std_logic_vector(31 downto 0);
+begin
+uut: mux2x1_32_bits
+port map (
+e_1_tb => e_1_tb_s,
+e_2_tb => e_2_tb_s,
+sel_sel => sel_sel_s,
+s_s => s_s_out
+);
+stim_proc : process
+begin
+e_1_tb_s <= (others => '1');
+e_2_tb_s <= (others => '0');
+sel_sel_s <= '0';
+wait for 100 ns;
+for i in 1 to 10 loop
+if sel_sel_s = '0'then
+sel_sel_s <= '1';
+else
+sel_sel_s <= '0';
+end if;
+wait for 100 ns;
+end loop;
+wait;
+end process;
+end test;
