@@ -1,0 +1,13 @@
+
+
+1-  Y = C
+
+2- Y = A'B'C' + A'BC + AB C'
+
+3- Y = A·B'·C
+
+4- Y = A'BC' + A'BC + AB'C + ABC
+
+5- Y = A⊕B (A XOR B)
+
+6- Y = A XNOR B = A·B + A'·B'
