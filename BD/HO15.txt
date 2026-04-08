@@ -1,0 +1,58 @@
+HO15: Controle de Concorrência
+
+
+
+
+Considerando a técnica de controle de concorrência por bloqueio exclusivo (binário) com protocolo 2PL estrito e confirmação (commit) implícita (commit da transação ocorre logo após a última operação da transação no escalonamento), o escalonamento Sa possui deadlock? Entre quais transações? Qual o escalonamento que efetivamente será executado, considerando a técnica de resolução de deadlock que identifique o deadlock e mate a transação mais recente (aquela em que sua primeira operação se inicie depois da primeira operação das outras).
+Sim, possui deadlock. Entre T2→T3→T2 (onde T2 espera por T3 em y, e T3 espera por T2 em z). O escalonamento efetivamente executado será:
+
+r3(y),r2(z),r1(x) (Bloqueios adquiridos).
+r2(x) (T2 espera por T1 em x).
+r3(z) (T3 espera por T2 em z).
+r2(y) (T2 espera por T3 em y) → Deadlock detectado.
+Abort T2 e U2(X,z).
+T3 adquire L3(X,z) e executa r3(z).
+w3(y),r3(x) (Operações restantes de T3). Commit T3 e libera L3(X,y),L3(X,z),L3(X,x).
+T1 adquire L1(X,y) e executa r1(y).
+w1(x),r1(z) (Operações restantes de T1). Commit T1 e libera L1(X,x),L1(X,y),L1(X,z).
+T2 Reinicia → Executa r2(z),r2(x),r2(y),w2(z) sequencialmente. Commit T2.
+Escalonamento Final: r3(y),r2(z),r1(x),(T2 aborta),r3(z),w3(y),r3(x),(Commit T3),r1(y),w1(x),r1(z),(Commit T1),r2(z),r2(x),r2(y),w2(z),(Commit T2)
+ 
+
+Considerando a técnica de controle de concorrência por bloqueio compartilhado (ternário) com protocolo 2PL estrito e confirmação (commit) implícita (commit da transação ocorre logo após a última operação da transação no escalonamento), o escalonamento Sa possui deadlock? Entre quais transações? Qual o escalonamento que efetivamente será executado, considerando a técnica de resolução de deadlock que identifique o deadlock e mate a transação mais recente (aquela em que sua primeira operação se inicie depois da primeira operação das outras)?
+Sim, possui deadlock. Entre: T3→T2→T3 (onde T3 espera por T2 em y, e T2 espera por T3 em z). O escalonamento efetivamente executado será:
+
+r3(y),r2(z),r1(x),r2(x),r3(z),r2(y),r1(y),r3(x),r1(z) (Todas adquirem S-Locks).
+w3(y) (T3 espera por T2 em y).
+w2(z) (T2 espera por T3 em z) → Deadlock detectado.
+Abort T2 e U2(S:z,x,y).
+T3 adquire L3(X,y) e executa w3(y).
+r3(x) (Operação restante de T3). Commit T3 e libera X:{y},S:{z,x}.
+T1 adquire L1(X,x) e executa w1(x).
+r1(z) (Operação restante de T1). Commit T1 e libera X:{x},S:{y,z}.
+T2 Reinicia → Executa r2(z),r2(x),r2(y),w2(z) sequencialmente. Commit T2.
+Escalonamento Final: r3(y)…r1(z),(T2 aborta),w3(y),w1(x),r3(x),(Commit T3),r1(z),(Commit T1),r2(z),r2(x),r2(y),w2(z),(Commit T2)
+ 
+
+Considerando a técnica de controle de concorrência por ordenação de registros de timestamp, qual o escalonamento que efetivamente será executado?
+O escalonamento efetivamente executado será:
+
+r3(y),r2(z),r1(x),r2(x),r3(z),r2(y),w3(y),r1(y),w2(z),w1(x) (Todas as operações são executadas ou atualizam RTS/WTS sem aborto).
+r3(x) → Abort T3. Todas as operações de T3 são desfeitas.
+r1(z) (Última operação de T1). Commit T1.
+T2 completa suas operações: r2(z),r2(x),r2(y),w2(z) já estão completas (a menos que T3 tenha sido abortada no passo 7, que não foi o caso).
+Considerando que r2(z),r2(x),r2(y) foram executadas e w2(z) foi executada no passo 9 (sem conflito), e que T3 é abortada: Commit T2.
+T3 Reinicia → Executa r3(y),r3(z),w3(y),r3(x) sequencialmente. Commit T3.
+Escalonamento Final: r3(y),r2(z),r1(x),r2(x),r3(z),r2(y),w3(y),r1(y),w2(z),w1(x),(T3 aborta),r1(z),(Commit T1),(Commit T2),(T3 restart)
+
+
+
+Considere que o escalonamento Sa apresentado abaixo foi constituído a partir das transações T1, T2 e T3 também apresentadas abaixo. Ressalta-se que, em um SGBDR diversas transações devem ser escalonadas para executarem simultaneamente, aumentando assim a concorrência e, consequentemente, diminuindo o tempo de processamento. No entanto, tal concorrência demanda a utilização de técnicas de controle de concorrência para garantir as propriedades de Atomicidade, Consistência, Isolamento e Durabilidade (ACID).
+
+T1 = r(x), r(y), w(x), r(z)
+
+T2 = r(z), r(x), r(y), w(z)
+
+T3 = r(y), r(z), w(y), r(x)
+
+Sa = r3(y), r2(z), r1(x), r2(x), r3(z), r2(y), w3(y), r1(y), w2(z), w1(x), r3(x), r1(z)
