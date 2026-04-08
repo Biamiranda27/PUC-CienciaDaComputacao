@@ -1,0 +1,28 @@
+HO04: Álgebra Relacional II
+1. Projetar o primeiro nome e o último nome dos atores que são diretores;
+A ← π primeiroNome, ultimoNome (Ator)
+B ← π primeiroNome, ultimoNome (Diretor)
+A ∩ B
+2. Projetar o primeiro nome e o último nome dos atores que não são diretores;
+A ← π primeiroNome, ultimoNome (Ator)
+B ← π primeiroNome, ultimoNome (Diretor)
+A - B
+3. Projetar o primeiro nome e o último nome dos atores e diretores;
+A ← π primeiroNome, ultimoNome (Ator)
+B ← π primeiroNome, ultimoNome (Diretor)
+A ∪ B
+4. Projetar o nome dos filmes que não são dirigidos por nenhum diretor;
+A ← π idFilme (Filme)
+B ← π idFilme (FilmeDiretor)
+C ← A - B
+D ← C ⨝ idFilme = idFilme Filme
+E ← π titulo (D)
+5. Projetar primeiro nome e o último nome dos atores que não atuaram em pelo menos dois filmes;
+A ← Elenco γ count(idFilme) → numFilme
+B ← σ numFilme > 2 (A)
+C ← π idAtor (B)
+D ← π idAtor (Ator)
+E ← D - C
+F ← E ⨝ idAtor = idAtor Ator
+G ← π nomeAtor (F)
+6. Projetar, por gênero e ano, o número médio de filmes com menos de dois atores atuando.
