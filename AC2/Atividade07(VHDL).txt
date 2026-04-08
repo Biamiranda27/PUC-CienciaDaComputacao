@@ -1,0 +1,235 @@
+/*Integre a ULA de 32 bits com o decodificador.
+*/
+
+
+// design
+//ula1bit.vhd
+library ieee;
+use ieee.std_logic_1164.all;
+entity ula_1bit is
+port (
+a : in std_logic;
+b : in std_logic;
+ci : in std_logic;
+binvert : in std_logic;
+option : in std_logic_vector(2 downto 0);
+result : out std_logic;
+co : out std_logic
+);
+end ula_1bit;
+architecture structural of ula_1bit is
+signal b_mux : std_logic;
+signal result_sum : std_logic;
+signal carry_sum : std_logic;
+signal result_and : std_logic;
+signal result_or : std_logic;
+begin
+b_mux <= b xor binvert;
+result_sum <= a xor b_mux xor ci;
+carry_sum <= (a and b_mux) or (ci and a) or (ci and b_mux);
+result_and <= a and b_mux;
+result_or <= a or b_mux;
+with option select
+result <= result_and when "000",
+result_or when "001",
+result_sum when "010",
+result_sum when others;
+co <= carry_sum when option = "010" else '0';
+end structural;
+--------------------------------------------------------------------------
+-------------------------
+//ula.vhd
+library ieee;
+use ieee.std_logic_1164.all;
+entity ula is
+port (
+a : in std_logic_vector(31 downto 0);
+b : in std_logic_vector(31 downto 0);
+ci : in std_logic;
+binvert : in std_logic;
+option : in std_logic_vector(2 downto 0);
+result : out std_logic_vector(31 downto 0);
+carry_out : out std_logic
+);
+end ula;
+architecture structural of ula is
+component ula_1bit
+port (
+a : in std_logic;
+b : in std_logic;
+ci : in std_logic;
+binvert : in std_logic;
+option : in std_logic_vector(2 downto 0);
+result : out std_logic;
+co : out std_logic
+);
+end component;
+signal s_carry : std_logic_vector(31 downto 0);
+begin
+ula0: ula_1bit
+port map (
+a => a(0),
+b => b(0),
+ci => ci,
+binvert => binvert,
+option => option,
+result => result(0),
+co => s_carry(0)
+);
+ula_gen: for i in 1 to 30 generate
+ulaBit: ula_1bit
+port map (
+a => a(i),
+b => b(i),
+ci => s_carry(i-1),
+binvert => binvert,
+option => option,
+result => result(i),
+co => s_carry(i)
+);
+end generate;
+ula31: ula_1bit
+port map (
+a => a(31),
+b => b(31),
+ci => s_carry(30),
+binvert => binvert,
+option => option,
+result => result(31),
+co => carry_out
+);
+end structural;
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+-----------------
+//TrueTable.vhd
+library ieee;
+use ieee.std_logic_1164.all;
+entity TrueTable is
+port (
+a : in std_logic;
+b : in std_logic;
+c : in std_logic;
+s1 : out std_logic;
+s2 : out std_logic;
+s3 : out std_logic
+);
+end TrueTable;
+architecture Behavioral of TrueTable is
+begin
+process(a, b, c)
+begin
+case a & b & c is
+when "000" => s1 <= '0'; s2 <= '0'; s3 <= '0';
+when "001" => s1 <= '0'; s2 <= '0'; s3 <= '1';
+when "010" => s1 <= '1'; s2 <= '0'; s3 <= '1';
+when "011" => s1 <= '1'; s2 <= '1'; s3 <= '1';
+when "100" => s1 <= '0'; s2 <= '0'; s3 <= '0';
+when "101" => s1 <= '0'; s2 <= '0'; s3 <= '1';
+when "110" => s1 <= '1'; s2 <= '1'; s3 <= '0';
+when "111" => s1 <= '1'; s2 <= '1'; s3 <= '1';
+when others => s1 <= 'X'; s2 <= 'X'; s3 <= 'X';
+end case;
+end process;
+end Behavioral;
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+entity ula_tb is
+end ula_tb;
+architecture test_ula of ula_tb is
+component ula
+port (
+a : in std_logic_vector(31 downto 0);
+b : in std_logic_vector(31 downto 0);
+ci : in std_logic;
+binvert : in std_logic;
+option : in std_logic_vector(2 downto 0);
+result : out std_logic_vector(31 downto 0);
+carryOut : out std_logic
+);
+end component;
+component TrueTable
+port (
+a : in std_logic;
+b : in std_logic;
+c : in std_logic;
+s1 : out std_logic;
+s2 : out std_logic;
+s3 : out std_logic
+);
+end component;
+signal s_a : std_logic_vector(31 downto 0) := (others => '0');
+signal s_b : std_logic_vector(31 downto 0) := (others => '0');
+signal s_ci : std_logic := '0';
+signal s_binvert : std_logic := '0';
+signal s_option : std_logic_vector(2 downto 0) := (others => '0');
+signal s_result : std_logic_vector(31 downto 0);
+signal s_carryOut : std_logic;
+signal dec_a : std_logic := '0';
+signal dec_b : std_logic := '0';
+signal dec_c : std_logic := '0';
+signal s1_dec : std_logic;
+signal s2_dec : std_logic;
+signal s3_dec : std_logic;
+begin
+DEC : TrueTable
+port map(
+a => dec_a,
+b => dec_b,
+c => dec_c,
+s1 => s1_dec,
+s2 => s2_dec,
+s3 => s3_dec
+);
+s_option <= s1_dec & s2_dec & s3_dec;
+DUT: ula
+port map (
+a => s_a,
+b => s_b,
+ci => s_ci,
+binvert => s_binvert,
+option => s_option,
+result => s_result,
+carryOut => s_carryOut
+);
+tb_process: process
+function to_vector (val : natural) return std_logic_vector is
+begin
+return std_logic_vector(to_unsigned(val, 32));
+end function;
+begin
+s_ci <= '0';
+s_binvert <= '0';
+s_a <= to_vector(0);
+s_b <= to_vector(0);
+dec_a <= '0'; dec_b <= '0'; dec_c <= '0';
+wait for 10 ns;
+s_a <= to_vector(5);
+s_b <= to_vector(3);
+wait for 10 ns;
+s_a <= to_vector(15);
+s_b <= to_vector(7);
+wait for 10 ns;
+dec_a <= '0'; dec_b <= '0'; dec_c <= '1';
+s_a <= to_vector(10);
+s_b <= to_vector(5);
+wait for 10 ns;
+dec_a <= '0'; dec_b <= '1'; dec_c <= '0';
+s_binvert <= '0';
+s_ci <= '0';
+s_a <= to_vector(10);
+s_b <= to_vector(5);
+wait for 10 ns;
+s_binvert <= '1';
+s_ci <= '1';
+s_a <= to_vector(10);
+s_b <= to_vector(5);
+wait for 10 ns;
+s_a <= to_vector(5);
+s_b <= to_vector(10);
+wait for 10 ns;
+wait;
+end process tb_process;
+end test_ula;
