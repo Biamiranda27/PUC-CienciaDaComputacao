@@ -1,0 +1,9 @@
+A partir de um código em C do algoritmo de ordenação Selection Sort, implementar um código em linguagem de montagem do MIPS para execução e avaliação de desempenho no simulador MARS.
+
+Na apresentação do trabalho, os alunos devem em laboratório:
+
+Explicar o algoritmo Selection Sort em C escolhido e a versão em linguagem de montagem do MIPS desenvolvida.
+Executar a versão assembly no MARS e explicar a simulação.
+Variar a execução com dados de entrada (leitura de arquivo) que tornem a execução mais rápida e mais lenta.
+Apresentar tempos de execução para cada teste fazendo uso de syscall.
+medição de tempo inicial e final, calcular tempo decorrido e print em tela.
