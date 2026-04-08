@@ -1,0 +1,9 @@
+Trabalho de um multiplicador de 32 bits
+
+Este trabalho pode ser feito em dupla ou trio. 
+
+Descrever em VHDL o hardware referente ao multiplicador de 32 bits, considerando hierarquia de projeto. Ou seja, não é apenas um design VHDL. Deve ter uma hierarquia de designs. Portanto, realizar os port maps necessários para chegar no multiplicador final.
+
+A arquitetura ou algoritmo para fazer o multiplicador é de livre escolha.
+
+Conteúdo está no livro indicado pela disciplina: Organização e Projeto de Computadores:  a interface hardware e software.
