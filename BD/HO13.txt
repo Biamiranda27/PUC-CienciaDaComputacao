@@ -1,0 +1,99 @@
+1 - Consulta original: 
+
+SELECT DISTINCT A.CPF, A.Nome
+
+FROM Funcionarios A
+
+WHERE A.CPF IN (SELECT CPF_Supervisor FROM Funcionarios)
+
+AND A.CPF NOT IN (SELECT CPF FROM Clientes)
+
+ 
+
+1 - Consulta otimizada: 
+
+SELECT DISTINCT F.CPF, F.Nome
+
+FROM Funcionarios F
+
+JOIN Funcionarios S ON F.CPF = S.CPF_Supervisor 
+
+WHERE NOT EXISTS (
+
+    SELECT 1
+
+    FROM Clientes C
+
+    WHERE F.CPF = C.CPF 
+
+);
+
+
+
+
+2 - Consulta original: 
+
+SELECT A.CodFilme, B.Nome
+
+FROM Midias A, Filmes B
+
+WHERE A.CodFilme = B.Codigo
+
+AND A.Tipo = "DVD"
+
+OR A.Tipo = "VHS"
+
+ 
+
+2 - Consulta otimizada:
+
+SELECT M.CodFilme, F.Nome
+
+FROM Midias M
+
+JOIN Filmes F ON M.CodFilme = F.Codigo 
+
+WHERE M.Tipo IN ('DVD', 'VHS'
+
+); 
+
+
+
+
+3 - Consulta original: 
+
+SELECT A.CPF_Cliente, A.ID_Midia, A.DataLocacao
+
+FROM Aluguel A, Clientes B
+
+WHERE A.CPF_Cliente = B.CPF
+
+AND B.Sexo != "F"
+
+AND EXISTS (SELECT * FROM Pagamentos C
+
+            WHERE C.CPF_Cliente = A.CPF_Cliente
+
+            AND C.ID_Midia = A.ID_Midia
+
+            AND C.DataLocacao = A.DataLocacao
+
+);
+
+ 
+
+3 - Consulta otimizada:
+
+SELECT A.CPF_Cliente, A.ID_Midia, A.DataLocacao
+
+FROM Aluguel A
+
+JOIN Clientes C ON A.CPF_Cliente = C.CPF -- Junta com Clientes para filtrar por sexo
+
+JOIN Pagamentos P ON A.CPF_Cliente = P.CPF_Cliente -- Junta com Pagamentos para garantir que exista
+
+                 AND A.ID_Midia = P.ID_Midia
+
+                 AND A.DataLocacao = P.DataLocacao
+
+WHERE C.Sexo != 'F'; -- Filtro por sexo
