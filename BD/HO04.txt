@@ -1,0 +1,27 @@
+HO04: Álgebra Relacional I
+1. Projetar o primeiro nome e o último nome dos atores de sexo feminino;
+A ← σ sexo = 'F'(Ator)
+B ← π primeiroNome, ultimoNome(A)
+2. Projetar o nome dos filmes com ano superior à 1999;
+A ← σ ano > 1999 (Filme)
+B ← π nome (A)
+3. Projetar o nome do filme e o nome do diretor de cada filme;
+A ← Filme ⨝ idFilme = idFilme FilmeDiretor
+B ← A ⨝ idDiretor = idDiretor Diretor
+C ← π nomeFilme, nomeDiretor (B)
+4. Projetar o nome do filme, nome do ator e o papel que cada ator teve no filme para filmes com ranking acima da nota 6;
+A ← Filme ⨝ idFilme = idFilme Elenco
+B ← A ⨝ nomeAtor = nomeAtor Ator
+C ← σ ranking > 6 (B)
+D ← π nomeFilme, nomeAtor, papelAtor (C)
+5. Projetar o nome do diretor e o número de filmes que cada diretor dirigiu;
+A ← FilmeDiretor γ sum(idFilme)(Filme) → numFilme
+B ← Diretor ⨝ idDiretor = idDiretor A
+C ← π nomeDiretor, numFilme (B)
+6. Projetar o gênero e o número de filmes de cada gênero;
+A ← Genero γ count(numeroFilme)(Filme) → numFilme
+B ← π genero, numFilme (A)
+7. Projetar o gênero, o ranking (nota) médio, mínimo e máximo dos filmes do gênero.
+A ← Filme ⨝ idFilme = idFilme FilmeGenero
+B ← A γ avg(ranking) → rankingMedio, min(ranking) → rankingMin, max(ranking) → rankingMax
+C ← π genero, rankingMedio, rankingMin, rankingMax (B)
